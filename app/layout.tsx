@@ -2,6 +2,9 @@ import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
 import { cn } from "@/lib/utils"
+import { Toaster } from "@/components/ui/sonner"
+import Navbar from "@/components/global/Navbar"
+import Footer from "@/components/global/Footer"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -17,14 +20,17 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className="h-full" suppressHydrationWarning>
-      <body className={cn("h-full antialiased", inter.className)}>
+    <html lang="en" className="h-full">
+      <body
+        className={cn("dark h-full antialiased", inter.className)}
+        suppressHydrationWarning
+      >
         <main className="flex flex-col h-full min-h-screen">
-          {/* <Navbar /> */}
+          <Navbar />
           <div className="flex-grow flex-1">{children}</div>
-          {/* <Footer /> */}
+          <Footer />
         </main>
-        {/* <Toaster position="top-center" richColors /> */}
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   )

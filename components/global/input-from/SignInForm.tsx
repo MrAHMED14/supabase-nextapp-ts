@@ -16,9 +16,12 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
-import { signInWithEmail } from "@/lib/db/action"
+import { signUpNewUser } from "@/lib/db/action"
 
 const FormSchema = z.object({
+  name: z.string().min(2, {
+    message: "name must be at least 2 characters.",
+  }),
   email: z.string().email(),
   password: z.string().min(2, {
     message: "password must be at least 2 characters.",
@@ -26,30 +29,32 @@ const FormSchema = z.object({
 })
 
 interface FormType {
+  name: string
   email: string
   password: string
 }
 
-const LoginFrom = () => {
+const SignInForm = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [pendingEmail, setPendingEmail] = useState<boolean>(false)
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
     },
   })
 
-  async function onSubmit({ email, password }: FormType) {
+  async function onSubmit({ email, name, password }: FormType) {
     setIsLoading(true)
     setPendingEmail(true)
 
-    const error = await signInWithEmail(email, password)
+    const error = await signUpNewUser(email, password, name)
 
-    if (error?.error) {
-      toast.error(error?.error)
+    if (error) {
+      toast.error(error.error)
     } else {
       form.reset()
     }
@@ -57,11 +62,25 @@ const LoginFrom = () => {
     setPendingEmail(false)
     setIsLoading(false)
   }
-
   return (
     <div className="w-full">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  name <span className="text-red-600">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter you name" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <FormField
             control={form.control}
             name="email"
@@ -105,7 +124,7 @@ const LoginFrom = () => {
                 </p>
               </>
             ) : (
-              "Login"
+              "Sign in"
             )}
           </Button>
         </form>
@@ -114,4 +133,4 @@ const LoginFrom = () => {
   )
 }
 
-export default LoginFrom
+export default SignInForm
